@@ -1,16 +1,9 @@
-import { Controller, Get, Body, Header, Headers, Param, Post, Query, Req } from '@nestjs/common';
+import { Get, Body, Headers, Param, Post, Query, Req } from '@nestjs/common';
+import { TController } from './core/decorators/http.decorators';
 import { OrganizationId } from './organization-id.decorator';
 
 // from this:
-@Controller({
-  path: 'cat',
-  version: ['1', '2']
-})
-// to this:
-// @Controller(['cat', '/org/:organizationId/cat'])
-// from this:
-// @Controller()
-// to this:
+@TController('cat')
 // @Controller('/org/:organizationId/cat')
 export class CatController {
   @Get()
@@ -40,9 +33,8 @@ export class CatController {
 }
 
 // from this:
-@Controller(['dog'])
-// to thus:
-// @Controller(['dog', '/org/:organizationId/dog'])
+@TController(['dog1', 'dog2'])
+// @Controller(['dog1', 'dog2', '/org/:organizationId/dog1', '/org/:organizationId/dog2'])
 export class DogController {
   @Get()
   list(
@@ -54,10 +46,8 @@ export class DogController {
   }
 }
 
-// from this:
-@Controller()
-// to thus:
-// @Controller(['/org/:organizationId/cat'])
+@TController()
+// @Controller(['/org/:organizationId/'])
 export class WithEmptyController {
   @Get('fish')
   list(
