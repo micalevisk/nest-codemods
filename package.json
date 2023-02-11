@@ -1,0 +1,30 @@
+{
+  "name": "foo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/main",
+  "scripts": {
+    "build": "nest build",
+    "tm": "nest start --entryFile sample-ts-morph",
+    "watch/tm": "nest start --watch --entryFile sample-ts-morph",
+    "start:dev": "nest start --watch",
+    "start:prod": "node ."
+  },
+  "keywords": [],
+  "author": "Micael Levi L. C.",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/common": "^9.3.8",
+    "@nestjs/core": "^9.3.8",
+    "@nestjs/platform-express": "^9.3.8",
+    "reflect-metadata": "^0.1.13",
+    "ts-morph": "^17.0.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^9.2.0",
+    "@nestjs/schematics": "^9.0.4",
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.13.0",
+    "typescript": "^4.9.5"
+  }
+}
