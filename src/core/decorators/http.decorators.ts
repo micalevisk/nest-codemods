@@ -7,17 +7,19 @@ export function TController(maybePrefix?: string | string[]) {
   /** Removes leading slashes ('/') from `path` */
   const trimPath = (path: string): string => path.replace(/^\/+/, '')
 
-  if (typeof maybePrefix === 'undefined') {
-    maybePrefix = '/orgs/:organization_id/'
-  }
+  const PREFIX = 'orgs/:organization_id/';
 
-  if (Array.isArray(maybePrefix)) {
-    maybePrefix.push(
-      ...maybePrefix.map(path =>
-        ('/orgs/:organization_id/').concat(trimPath(path))
-      )
-    )
-  }
+  if (typeof maybePrefix === 'undefined') maybePrefix = '/';
 
-  return Controller(maybePrefix)
+  if (!Array.isArray(maybePrefix)) maybePrefix = [maybePrefix];
+
+  maybePrefix.push(
+    ...maybePrefix.map(path => {
+      const pathWithoutLeadingSlash = trimPath(path);
+      if (pathWithoutLeadingSlash.startsWith(PREFIX)) return path;
+      return (PREFIX).concat(pathWithoutLeadingSlash);
+    })
+  );
+
+  return Controller(maybePrefix);
 }

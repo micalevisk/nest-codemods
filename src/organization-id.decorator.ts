@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common"
+import type { Request } from "express";
 
 /**
  * Decorator factory to use at some controller's method to retrieve the id of
@@ -13,7 +14,10 @@ import { createParamDecorator, ExecutionContext } from "@nestjs/common"
  * ```
  */
 export const OrganizationId = createParamDecorator<never, ExecutionContext, string | undefined>((_, ctx) => {
-  const req = ctx.switchToHttp().getRequest();
-  return req.params.organizationId || undefined
+  const req = ctx.switchToHttp().getRequest<Request>();
+
+  // TODO: validate that the organizationId is a valid UUID
+
+  return req.params['organization_id'] || undefined
 })
 export type OrganizationId = string | undefined

@@ -1,29 +1,17 @@
-import { Get, Body, Headers, Param, Post, Query, Req } from '@nestjs/common';
+import { Get, Body, Post } from '@nestjs/common';
 import { TController } from './core/decorators/http.decorators';
 import { OrganizationId } from './organization-id.decorator';
 
-// from this:
 @TController('cat')
-// @Controller('/org/:organizationId/cat')
+// @Controller('/orgs/:organizationId/cat')
 export class CatController {
   @Get()
   list(
-    @Req() req: any,
-    @Param('organizationId') organizationId: string,
     @OrganizationId() orgId: OrganizationId,
-    @Query() query: string,
-    @Headers('x-foo') headerValue: string,
   ) {
-    console.log('>>>>>>>>>>>>>>>>> list cat');
-
     return {
-      foo: query,
-      reqParams: req.params,
-      reqHeaders: req.headers,
-      headerValue: headerValue || null,
       orgId: orgId || null,
-      organizationId: organizationId || null
-    }
+    };
   }
 
   @Post()
@@ -32,29 +20,28 @@ export class CatController {
   }
 }
 
-// from this:
 @TController(['dog1', 'dog2'])
-// @Controller(['dog1', 'dog2', '/org/:organizationId/dog1', '/org/:organizationId/dog2'])
+// @Controller(['dog1', 'dog2', '/orgs/:organizationId/dog1', '/orgs/:organizationId/dog2'])
 export class DogController {
   @Get()
   list(
-    @Param('organizationId') organizationId: string,
+    @OrganizationId() orgId: OrganizationId,
   ) {
     return {
-      organizationId: organizationId || null
+      orgId: orgId || null,
     }
   }
 }
 
 @TController()
-// @Controller(['/org/:organizationId/'])
+// @Controller(['/orgs/:organizationId/'])
 export class WithEmptyController {
   @Get('fish')
   list(
-    @Param('organizationId') organizationId: string,
+    @OrganizationId() orgId: OrganizationId,
   ) {
     return {
-      organizationId: organizationId || null
+      orgId: orgId || null,
     }
   }
 }
