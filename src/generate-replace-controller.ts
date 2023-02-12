@@ -23,8 +23,7 @@ function run({ dryRun = true }) {
       './src/**/*.controller.ts',
     ])
     .forEach((sourceFile) => {
-      const isControllerFile = sourceFile.getBaseName().endsWith('.controller.ts')
-      if (sourceFile.isDeclarationFile() || !isControllerFile) return;
+      if (sourceFile.isDeclarationFile()) return;
 
       if (dryRun) {
         console.log(sourceFile.getBaseName());
