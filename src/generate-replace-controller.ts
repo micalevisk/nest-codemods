@@ -77,6 +77,12 @@ function addImportOfNewControllerDecorator(
   });
 }
 
+function shouldReplaceControllerDecorator(decorator: ts.Decorator): boolean {
+  const firstArg = decorator.getArguments().pop()
+  if (!firstArg) return true
+  return !firstArg.isKind(ts.SyntaxKind.ObjectLiteralExpression)
+}
+
 function isControllerDecorator(decorator: ts.Decorator) {
   return decorator.getName().toLowerCase() === 'controller' && decorator.isDecoratorFactory()
 }
@@ -100,6 +106,10 @@ function swapDecoratorsOnFile(
       .pop()
     if (!firstControllerDecoratorDecl) return
 
-    firstControllerDecoratorDecl.getNameNode().replaceWithText('TController')
+    if (shouldReplaceControllerDecorator(firstControllerDecoratorDecl)) {
+      firstControllerDecoratorDecl.getNameNode().replaceWithText('TController')
+    } else {
+      declarationsToRemove.pop() // Should not remove the import declaration
+    }
   })
 }

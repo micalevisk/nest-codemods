@@ -75,6 +75,9 @@ function swapDecoratorsOnFile(sourceFile: ts.SourceFile) {
     let firstArgOnControllerDecorator = firstControllerDecoratorDecl.getArguments().pop()
     if (!firstArgOnControllerDecorator) return
 
+    // Do not touch on `@Controller({ path: 'path' })` occurrences
+    if (firstArgOnControllerDecorator.isKind(ts.SyntaxKind.ObjectLiteralExpression)) return;
+
     // Replace `@Controller('path')` with `@Controller(['/path'])`
     if (ts.Node.isStringLiteral(firstArgOnControllerDecorator)) {
       const value = firstArgOnControllerDecorator.getLiteralValue()

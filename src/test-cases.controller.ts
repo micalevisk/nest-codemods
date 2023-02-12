@@ -24,6 +24,10 @@ export class C2 {}
 @Controller(['/c/foo/bar'])
 export class C3 {}
 
+// edge case not covered because it doesn't exist in the repo 'tarkenag/hub-server'
+@Controller({ path: 'bar' })
+export class D {}
+
 /* // Casos não cobertos pois não possuem na codebase do repositório 'tarkenag/hub-server'
 
 // empty opts
