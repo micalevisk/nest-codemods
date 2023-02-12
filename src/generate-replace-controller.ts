@@ -17,7 +17,6 @@ function run({ dryRun = true }) {
   const newControllerDecoratorSourceFile =
     project.getSourceFileOrThrow('./src/core/decorators/http.decorators.ts')
 
-
   project
     .getSourceFiles([
       './src/**/*.controller.ts',
@@ -33,9 +32,10 @@ function run({ dryRun = true }) {
         })
       }
 
-      const declarationsToRemove: ts.ImportSpecifier[] = []
-      swapDecoratorsOnFile(declarationsToRemove, newControllerDecoratorSourceFile, sourceFile)
-      removeImportDeclarations(declarationsToRemove)
+      const importDeclarationsWithOldImport: ts.ImportDeclaration[] = []
+      swapDecoratorsOnFile(importDeclarationsWithOldImport, sourceFile)
+      removeImportDeclarations(importDeclarationsWithOldImport)
+      addImportOfNewControllerDecorator(newControllerDecoratorSourceFile, sourceFile)
     })
 
   project.saveSync()
@@ -46,22 +46,47 @@ run({ dryRun: true })
 
 // ========================================================================== //
 
-function removeImportDeclarations(importSpecifier: ts.ImportSpecifier[]) {
-  importSpecifier.forEach(declaration => declaration.remove())
+function isControllerDecl(importSpecifier: ts.ImportSpecifier) {
+  return importSpecifier.getName() === 'Controller'
+}
+
+function removeImportDeclarations(importDeclarationsWithOldImport: ts.ImportDeclaration[]) {
+  const importSpecifiers: {
+    importDeclaration: ts.ImportDeclaration
+    importSpecifier: ts.ImportSpecifier
+  }[] = []
+
+  // Search all import specifiers for the old import that should be removed
+  // as well as their import declarations
+  importDeclarationsWithOldImport.forEach((importDeclaration) => {
+    const namedImports = importDeclaration.getNamedImports()
+    const importSpecifier = namedImports.find(isControllerDecl)
+    if (importSpecifier) {
+      importSpecifiers.push({
+        importDeclaration,
+        importSpecifier,
+      })
+    }
+  })
+
+  importSpecifiers.forEach(({ importDeclaration, importSpecifier }) => {
+    const hasSiblingImportSpecifiers = !!importDeclaration.getNextSibling()
+    if (hasSiblingImportSpecifiers) {
+      importDeclaration.remove()
+    } else {
+      importSpecifier.remove()
+    }
+  })
 }
 
 function getFirstControllerImportDeclaration(sourceFile: ts.SourceFile) {
-  const isControllerDecl = (importSpecifier: ts.ImportSpecifier) =>
-    importSpecifier.getName() === 'Controller'
-
-  const importWithDefaultImport = sourceFile.getImportDeclarationOrThrow(
+  const importDeclartion = sourceFile.getImportDeclarationOrThrow(
     (importDeclaration) => importDeclaration.getNamedImports()
       .some(isControllerDecl)
   )
-  if (!importWithDefaultImport) return;
+  if (!importDeclartion) return;
 
-  const namedImports = importWithDefaultImport.getNamedImports()
-  return namedImports.find(isControllerDecl)
+  return importDeclartion
 }
 
 function addImportOfNewControllerDecorator(
@@ -88,16 +113,13 @@ function isControllerDecorator(decorator: ts.Decorator) {
 }
 
 function swapDecoratorsOnFile(
-  declarationsToRemove: ts.ImportSpecifier[],
-  newControllerDecoratorSourceFile: ts.SourceFile,
+  importDeclarationsWithOldImport: ts.ImportDeclaration[],
   sourceFile: ts.SourceFile,
 ) {
   const classes = sourceFile.getClasses()
 
   const declarationToRemove = getFirstControllerImportDeclaration(sourceFile)
-  if (declarationToRemove) declarationsToRemove.push(declarationToRemove)
-
-  addImportOfNewControllerDecorator(newControllerDecoratorSourceFile, sourceFile)
+  if (declarationToRemove) importDeclarationsWithOldImport.push(declarationToRemove)
 
   classes.forEach((classDecl) => {
     const firstControllerDecoratorDecl = classDecl
@@ -109,7 +131,7 @@ function swapDecoratorsOnFile(
     if (shouldReplaceControllerDecorator(firstControllerDecoratorDecl)) {
       firstControllerDecoratorDecl.getNameNode().replaceWithText('TController')
     } else {
-      declarationsToRemove.pop() // Should not remove the import declaration
+      importDeclarationsWithOldImport.pop() // Should not remove the import declaration
     }
   })
 }
