@@ -5,8 +5,10 @@
   "main": "dist/src/main",
   "scripts": {
     "build": "nest build",
-    "tm": "nest start --entryFile sample-ts-morph",
-    "watch/tm": "nest start --watch --entryFile sample-ts-morph",
+    "tm:generate-inline": "nest start --entryFile generate-inline",
+    "watch/tm:generate-inline": "nest start --watch --entryFile generate-inline",
+    "tm:generate-replace-controller": "nest start --entryFile generate-replace-controller",
+    "watch/tm:generate-replace-controller": "nest start --watch --entryFile generate-replace-controller",
     "start:dev": "nest start --watch",
     "start:prod": "node .",
     "test:e2e": "jest --config ./test/jest-e2e.json"
