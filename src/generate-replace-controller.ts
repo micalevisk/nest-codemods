@@ -17,6 +17,7 @@ function run({ dryRun = true }) {
   const newControllerDecoratorSourceFile =
     project.getSourceFileOrThrow('./src/core/decorators/http.decorators.ts')
 
+
   project
     .getSourceFiles([
       './src/**/*.controller.ts',
@@ -33,7 +34,9 @@ function run({ dryRun = true }) {
         })
       }
 
-      swapDecoratorsOnFile(newControllerDecoratorSourceFile, sourceFile)
+      const declarationsToRemove: ts.ImportSpecifier[] = []
+      swapDecoratorsOnFile(declarationsToRemove, newControllerDecoratorSourceFile, sourceFile)
+      removeImportDeclarations(declarationsToRemove)
     })
 
   project.saveSync()
@@ -44,7 +47,11 @@ run({ dryRun: true })
 
 // ========================================================================== //
 
-function removeFirstControllerImportDeclaration(sourceFile: ts.SourceFile) {
+function removeImportDeclarations(importSpecifier: ts.ImportSpecifier[]) {
+  importSpecifier.forEach(declaration => declaration.remove())
+}
+
+function getFirstControllerImportDeclaration(sourceFile: ts.SourceFile) {
   const isControllerDecl = (importSpecifier: ts.ImportSpecifier) =>
     importSpecifier.getName() === 'Controller'
 
@@ -52,12 +59,10 @@ function removeFirstControllerImportDeclaration(sourceFile: ts.SourceFile) {
     (importDeclaration) => importDeclaration.getNamedImports()
       .some(isControllerDecl)
   )
-  if (!importWithDefaultImport) return false
+  if (!importWithDefaultImport) return;
 
   const namedImports = importWithDefaultImport.getNamedImports()
-  namedImports.find(isControllerDecl)?.remove()
-
-  return true
+  return namedImports.find(isControllerDecl)
 }
 
 function addImportOfNewControllerDecorator(
@@ -78,12 +83,14 @@ function isControllerDecorator(decorator: ts.Decorator) {
 }
 
 function swapDecoratorsOnFile(
+  declarationsToRemove: ts.ImportSpecifier[],
   newControllerDecoratorSourceFile: ts.SourceFile,
   sourceFile: ts.SourceFile,
 ) {
   const classes = sourceFile.getClasses()
 
-  if (!removeFirstControllerImportDeclaration(sourceFile)) return
+  const declarationToRemove = getFirstControllerImportDeclaration(sourceFile)
+  if (declarationToRemove) declarationsToRemove.push(declarationToRemove)
 
   addImportOfNewControllerDecorator(newControllerDecoratorSourceFile, sourceFile)
 
