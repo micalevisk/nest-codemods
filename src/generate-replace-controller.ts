@@ -24,8 +24,9 @@ function run({ dryRun = true }) {
     .forEach((sourceFile) => {
       if (sourceFile.isDeclarationFile()) return;
 
+      console.log(sourceFile.getBaseName());
+
       if (dryRun) {
-        console.log(sourceFile.getBaseName());
         sourceFile = sourceFile.copy(
           sourceFile.getFilePath() + '.new-controller.ts', {
           overwrite: true,
