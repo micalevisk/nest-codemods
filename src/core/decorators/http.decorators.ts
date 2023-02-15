@@ -6,7 +6,7 @@ const trimPath = (path: string): string => path.replace(/^\/+/, '')
 /** Tentant bound controller */
 export function TController(): ClassDecorator;
 export function TController(prefix: string | string[]): ClassDecorator;
-export function TController(maybePrefix?: string | string[]) {
+export function TController(maybePrefix?: string | string[]): ClassDecorator {
   const PREFIX = 'orgs/:organization_id/';
 
   if (typeof maybePrefix === 'undefined') maybePrefix = ['/'];
