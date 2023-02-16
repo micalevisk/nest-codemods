@@ -1,0 +1,14 @@
+{
+  "name": "script-replace-all-controller-decorator",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx ts-node --transpileOnly src/cli"
+  },
+  "author": "Micael Levi L. C.",
+  "dependencies": {
+    "ts-morph": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0"
+  }
+}
