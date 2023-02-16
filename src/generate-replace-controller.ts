@@ -4,7 +4,10 @@
 import * as ts from 'ts-morph'
 import * as path from 'path'
 
-function run({ dryRun = true }) {
+function run({
+  pathToNewController,
+  dryRun = true,
+}) {
   const tsConfigFilePath = path.resolve('./tsconfig.build.json')
 
   const project = new ts.Project({
@@ -15,7 +18,9 @@ function run({ dryRun = true }) {
   })
 
   const newControllerDecoratorSourceFile =
-    project.getSourceFileOrThrow('./src/core/decorators/http.decorators.ts')
+    project.getSourceFileOrThrow(
+      path.resolve(pathToNewController)
+    )
 
   project
     .getSourceFiles([
@@ -42,7 +47,10 @@ function run({ dryRun = true }) {
   project.saveSync()
 }
 
-run({ dryRun: true })
+run({
+  pathToNewController: './src/core/decorators/http.decorators.ts',
+  dryRun: true,
+})
 
 
 // ========================================================================== //
