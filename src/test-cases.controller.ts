@@ -1,11 +1,15 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiProduces } from '@nestjs/swagger';
+import { ApiProject } from './core/decorators/api-project.decorator';
 
 // no args
 @Controller()
+@ApiProduces()
 export class A {}
 
 // one simple args
 @Controller('b')
+@ApiProject('foo')
 export class B {}
 
 // one simple args (2)

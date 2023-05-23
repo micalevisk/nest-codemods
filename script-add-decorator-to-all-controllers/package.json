@@ -1,0 +1,15 @@
+{
+  "name": "script-add-decorator-to-all-controllers",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "start": "npx ts-node --transpileOnly src/cli"
+  },
+  "author": "Micael Levi L. C.",
+  "dependencies": {
+    "ts-morph": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0"
+  }
+}
